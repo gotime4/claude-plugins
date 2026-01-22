@@ -1,80 +1,68 @@
 # Claude Plugins Marketplace
 
-A collection of Claude Code plugins for enterprise workflow automation.
+Enterprise workflow automation plugins for Claude Code.
 
 ## Available Plugins
 
 | Plugin | Description | Version |
 |--------|-------------|---------|
-| [workflow-weaver](./plugins/workflow-weaver) | Enterprise-grade AI workflow orchestration with multi-agent task decomposition | 1.0.0 |
+| [workflow-weaver](./plugins/workflow-weaver) | Multi-agent workflow orchestration with task decomposition | 1.0.0 |
 
 ## Installation
 
-### 1. Add the Marketplace
-
 ```bash
+# Add marketplace
 /plugin marketplace add gotime4/claude-plugins
-```
 
-Replace `gotime4` with your GitHub username after pushing this repo.
-
-### 2. Install a Plugin
-
-```bash
+# Install plugin
 /plugin install workflow-weaver@gotime4-claude-plugins
-```
 
-### 3. Verify Installation
-
-```bash
+# Verify
 /plugin
 ```
 
 ## Usage
 
-After installation, plugin commands are namespaced:
-
 ```bash
-# Start a workflow
 /workflow-weaver:weave Add user authentication
-
-# Generate a PRD
 /workflow-weaver:draft-prd Add payment integration
-
-# Run tasks
 /workflow-weaver:ralph-run --all
 ```
 
-## Publishing to GitHub
+## Security & Trust
 
-1. Create a new repository on GitHub
-2. Push this folder:
+**What this plugin does:**
+- Orchestrates local file operations (read/write/edit)
+- Runs shell commands you approve (tests, builds, git)
+- Persists state in local JSON files
 
-```bash
-cd claude-plugins
-git init
-git add .
-git commit -m "Initial commit: Workflow-Weaver plugin"
-git remote add origin https://github.com/gotime4/claude-plugins.git
-git push -u origin main
-```
+**What this plugin does NOT do:**
+- No external API calls
+- No network requests
+- No telemetry or data collection
+- No access beyond your project directory
 
-3. Users can then install with:
+**Safe defaults:**
+- All file operations require your approval
+- Git commits are never automatic unless you pass `--commit`
+- No dependencies outside Claude Code's built-in tools
 
-```bash
-/plugin marketplace add gotime4/claude-plugins
-/plugin install workflow-weaver@gotime4-claude-plugins
-```
+## Environment Support
 
-## Adding More Plugins
+| Environment | Status |
+|-------------|--------|
+| macOS | Supported |
+| Linux | Supported |
+| Windows | Supported (WSL recommended) |
+| Offline/air-gapped | Fully supported |
+| Corporate proxy | No external calls needed |
 
-To add another plugin:
+## Adding Plugins
 
-1. Create a new folder in `plugins/`
-2. Add `.claude-plugin/plugin.json` manifest
+1. Create folder in `plugins/`
+2. Add `.claude-plugin/plugin.json`
 3. Add commands in `commands/`
-4. Add skills in `skills/`
-5. Update `marketplace.json` with the new plugin entry
+4. Update `marketplace.json`
 
 ## License
 
