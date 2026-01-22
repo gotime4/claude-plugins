@@ -167,14 +167,32 @@ constraints:
 
 ## Options
 
-| Option | Description |
-|--------|-------------|
-| `--from-plan <path>` | Use a plan document as input |
-| `--from-issue <url>` | Pull requirements from GitHub issue |
-| `--dry-run` | Show decomposition without starting |
-| `--priority=<level>` | Set priority (low/medium/high/critical) |
-| `--scope=<files>` | Pre-constrain file scope |
-| `--skip-analysis` | Skip analysis phase (use with detailed plans) |
+| Option | Description | Default |
+|--------|-------------|---------|
+| `--from-plan <path>` | Use a plan document as input | - |
+| `--from-issue <url>` | Pull requirements from GitHub issue | - |
+| `--max-loops=N` | Max validation retries per task | `5` |
+| `--fail-fast` | Stop on first validation failure (`--max-loops=1`) | - |
+| `--dry-run` | Show decomposition without starting | - |
+| `--priority=<level>` | Set priority (low/medium/high/critical) | - |
+| `--scope=<files>` | Pre-constrain file scope | - |
+| `--skip-analysis` | Skip analysis phase (use with detailed plans) | - |
+
+## Examples with Loop Control
+
+```bash
+# Default: 5 retries per task
+/weave Add user authentication
+
+# Conservative: fail fast, review errors manually
+/weave --from-plan ./PLAN.md --max-loops=2
+
+# Very conservative: no retries
+/weave --from-plan ./PLAN.md --fail-fast
+
+# More aggressive: let it try harder
+/weave --from-plan ./PLAN.md --max-loops=10
+```
 
 ## Notes
 
@@ -183,3 +201,4 @@ constraints:
 - Use `/weave-abort` to cancel if needed
 - Threads auto-checkpoint; use `/weave-resume` after interruption
 - Plans from `/plan` mode preserve the analysis already done
+- `--max-loops` applies to all tasks in the thread

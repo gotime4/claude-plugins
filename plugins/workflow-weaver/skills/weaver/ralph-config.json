@@ -4,8 +4,9 @@
   "description": "Configuration for Ralph Executor",
 
   "execution": {
-    "max_iterations": 5,
-    "iteration_timeout_seconds": 300,
+    "max_loops": 5,
+    "max_loops_note": "Override per-run with --max-loops=N or --fail-fast",
+    "loop_timeout_seconds": 300,
     "total_timeout_seconds": 1800,
     "parallel_tasks": false
   },
