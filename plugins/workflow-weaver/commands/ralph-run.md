@@ -3,14 +3,19 @@
 ## Invocation
 
 ```bash
-# Basic
+# Basic (inherits model from parent session)
 /ralph-run [task-id]
 
 # With loop limit (stop after N failed attempts)
 /ralph-run T3 --max-loops=3
 
-# Run all tasks with limited retries
-/ralph-run --all --max-loops=2
+# Specify model for sub-agents
+/ralph-run T3 --model=sonnet
+/ralph-run T3 --model=haiku      # Faster, cheaper
+/ralph-run T3 --model=opus       # Most capable
+
+# Run all tasks with specific model
+/ralph-run --all --model=sonnet --max-loops=2
 
 # Fail fast (no retries)
 /ralph-run T3 --max-loops=1
@@ -81,6 +86,49 @@ Control how many times the agent retries on validation failure:
 - Tests are flaky
 - You trust the agent to self-correct
 
+## Model Selection
+
+By default, sub-agents inherit the model from your main session. Override with `--model`:
+
+```bash
+# Inherit from parent (default)
+/ralph-run T3
+
+# Use Sonnet (balanced speed/capability)
+/ralph-run T3 --model=sonnet
+
+# Use Haiku (fastest, cheapest - good for simple tasks)
+/ralph-run T3 --model=haiku
+
+# Use Opus (most capable - for complex debugging)
+/ralph-run T3 --model=opus
+```
+
+**Model recommendations by task type:**
+
+| Task Type | Recommended Model | Why |
+|-----------|------------------|-----|
+| Simple file edits | `haiku` | Fast, cheap, sufficient |
+| Implementation | `sonnet` | Good balance |
+| Test writing | `sonnet` | Needs reasoning |
+| Complex debugging | `opus` | Best at analysis |
+| Architecture decisions | `opus` | Needs deep thinking |
+
+**Configure defaults in `ralph-config.json`:**
+
+```json
+{
+  "models": {
+    "default": "inherit",
+    "by_task_type": {
+      "implementation": "sonnet",
+      "test-first": "sonnet",
+      "verification": "haiku"
+    }
+  }
+}
+```
+
 ## Process Isolation
 
 Each task runs in a **stateless sub-agent** with:
@@ -133,6 +181,7 @@ Only after ALL checks pass is the task marked `verified` in WEAVER_STATE.json.
 
 | Option | Description | Default |
 |--------|-------------|---------|
+| `--model=<model>` | Model for sub-agents: `inherit`, `haiku`, `sonnet`, `opus` | `inherit` |
 | `--max-loops=N` | Max validation retries before escalating | `5` |
 | `--all` | Run all pending tasks sequentially | - |
 | `--phase=N` | Run all tasks in phase N | - |

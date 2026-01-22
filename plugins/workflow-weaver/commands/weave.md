@@ -171,6 +171,7 @@ constraints:
 |--------|-------------|---------|
 | `--from-plan <path>` | Use a plan document as input | - |
 | `--from-issue <url>` | Pull requirements from GitHub issue | - |
+| `--model=<model>` | Model for sub-agents: `inherit`, `haiku`, `sonnet`, `opus` | `inherit` |
 | `--max-loops=N` | Max validation retries per task | `5` |
 | `--fail-fast` | Stop on first validation failure (`--max-loops=1`) | - |
 | `--dry-run` | Show decomposition without starting | - |
@@ -178,20 +179,26 @@ constraints:
 | `--scope=<files>` | Pre-constrain file scope | - |
 | `--skip-analysis` | Skip analysis phase (use with detailed plans) | - |
 
-## Examples with Loop Control
+## Examples with Model and Loop Control
 
 ```bash
-# Default: 5 retries per task
+# Default: inherit model, 5 retries per task
 /weave Add user authentication
+
+# Use Sonnet for sub-agents (balanced)
+/weave --from-plan ./PLAN.md --model=sonnet
+
+# Use Haiku for speed/cost (simpler tasks)
+/weave --from-plan ./PLAN.md --model=haiku
+
+# Use Opus for complex features
+/weave --from-plan ./PLAN.md --model=opus
 
 # Conservative: fail fast, review errors manually
 /weave --from-plan ./PLAN.md --max-loops=2
 
-# Very conservative: no retries
-/weave --from-plan ./PLAN.md --fail-fast
-
-# More aggressive: let it try harder
-/weave --from-plan ./PLAN.md --max-loops=10
+# Combined: Haiku with limited retries
+/weave --from-plan ./PLAN.md --model=haiku --max-loops=2
 ```
 
 ## Notes

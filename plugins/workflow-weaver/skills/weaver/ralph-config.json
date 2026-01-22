@@ -3,6 +3,30 @@
   "version": "1.0",
   "description": "Configuration for Ralph Executor",
 
+  "models": {
+    "_comment": "Model selection for sub-agents. Options: 'inherit' | 'opus' | 'sonnet' | 'haiku'",
+    "default": "inherit",
+    "by_agent_type": {
+      "analyst": "inherit",
+      "architect": "inherit",
+      "implementer": "inherit",
+      "verifier": "inherit"
+    },
+    "by_task_type": {
+      "analysis": "inherit",
+      "design": "inherit",
+      "implementation": "inherit",
+      "test-first": "inherit",
+      "verification": "inherit"
+    },
+    "cost_optimization": {
+      "enabled": false,
+      "use_haiku_for": ["simple_edits", "file_searches", "lint_fixes"],
+      "use_sonnet_for": ["implementation", "test_writing"],
+      "use_opus_for": ["architecture", "complex_debugging"]
+    }
+  },
+
   "execution": {
     "max_loops": 5,
     "max_loops_note": "Override per-run with --max-loops=N or --fail-fast",
