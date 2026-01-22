@@ -1,0 +1,446 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://weaver.local/task-schema.json",
+  "title": "Weaver Task Contract",
+  "description": "Schema for tasks.json - the executable contract for sub-agents",
+  "type": "object",
+  "required": ["version", "blueprint_source", "generated_at", "tasks", "execution_plan"],
+
+  "properties": {
+    "version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+$",
+      "description": "Schema version"
+    },
+
+    "blueprint_source": {
+      "type": "string",
+      "description": "Path to source WEAVER_BLUEPRINT.md"
+    },
+
+    "generated_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO timestamp of generation"
+    },
+
+    "thread_id": {
+      "type": "string",
+      "description": "Link to WEAVER_STATE thread"
+    },
+
+    "metadata": {
+      "type": "object",
+      "properties": {
+        "total_tasks": { "type": "integer", "minimum": 1 },
+        "estimated_agent_loops": { "type": "integer", "minimum": 1 },
+        "critical_path": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Task IDs on the critical path"
+        },
+        "parallelizable_groups": {
+          "type": "array",
+          "items": {
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "description": "Groups of tasks that can run in parallel"
+        }
+      }
+    },
+
+    "tasks": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/definitions/Task" }
+    },
+
+    "validation_summary": {
+      "type": "object",
+      "required": ["all_tasks_have_validation"],
+      "properties": {
+        "all_tasks_have_validation": { "type": "boolean" },
+        "test_first_tasks": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "validation_commands": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      }
+    },
+
+    "execution_plan": {
+      "type": "object",
+      "required": ["phases"],
+      "properties": {
+        "phases": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/Phase" }
+        },
+        "estimated_total_loops": { "type": "integer" },
+        "checkpoint_after": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      }
+    }
+  },
+
+  "definitions": {
+    "Task": {
+      "type": "object",
+      "required": [
+        "id",
+        "name",
+        "type",
+        "description",
+        "atomicity",
+        "target_files",
+        "required_context",
+        "constraints",
+        "validation",
+        "success_markers",
+        "dependencies",
+        "agent_assignment"
+      ],
+
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^T\\d+(\\.\\d+)?$",
+          "description": "Task identifier (e.g., T1, T1.1, T2)"
+        },
+
+        "name": {
+          "type": "string",
+          "maxLength": 100,
+          "description": "Short descriptive name"
+        },
+
+        "type": {
+          "type": "string",
+          "enum": ["implementation", "test-first", "test", "refactor", "documentation", "configuration"],
+          "description": "Task category"
+        },
+
+        "description": {
+          "type": "string",
+          "description": "Detailed description of what this task accomplishes"
+        },
+
+        "priority": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 10,
+          "description": "Execution priority (1 = highest)"
+        },
+
+        "atomicity": {
+          "$ref": "#/definitions/Atomicity"
+        },
+
+        "target_files": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 5,
+          "items": { "$ref": "#/definitions/TargetFile" }
+        },
+
+        "required_context": {
+          "$ref": "#/definitions/RequiredContext"
+        },
+
+        "constraints": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/Constraint" }
+        },
+
+        "validation": {
+          "$ref": "#/definitions/Validation"
+        },
+
+        "success_markers": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/definitions/SuccessMarker" }
+        },
+
+        "dependencies": {
+          "$ref": "#/definitions/Dependencies"
+        },
+
+        "agent_assignment": {
+          "$ref": "#/definitions/AgentAssignment"
+        },
+
+        "rollback": {
+          "$ref": "#/definitions/Rollback"
+        }
+      }
+    },
+
+    "Atomicity": {
+      "type": "object",
+      "required": ["file_count", "within_limits"],
+      "properties": {
+        "file_count": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 5,
+          "description": "Number of files affected"
+        },
+        "estimated_lines": {
+          "type": "integer",
+          "maximum": 300,
+          "description": "Estimated lines of code"
+        },
+        "concerns": {
+          "type": "array",
+          "items": { "type": "string" },
+          "maxItems": 1,
+          "description": "Single concern this task addresses"
+        },
+        "within_limits": {
+          "type": "boolean",
+          "description": "Whether task meets atomicity constraints"
+        }
+      }
+    },
+
+    "TargetFile": {
+      "type": "object",
+      "required": ["path", "action", "purpose"],
+      "properties": {
+        "path": {
+          "type": "string",
+          "description": "Relative file path"
+        },
+        "action": {
+          "type": "string",
+          "enum": ["CREATE", "MODIFY", "DELETE"],
+          "description": "What action to take on file"
+        },
+        "purpose": {
+          "type": "string",
+          "description": "Why this file is being changed"
+        }
+      }
+    },
+
+    "RequiredContext": {
+      "type": "object",
+      "required": ["direct_targets", "total_files", "estimated_tokens"],
+      "properties": {
+        "direct_targets": {
+          "type": "array",
+          "items": { "type": "string" },
+          "maxItems": 5,
+          "description": "Files being directly modified"
+        },
+        "dependencies": {
+          "type": "array",
+          "items": { "type": "string" },
+          "maxItems": 3,
+          "description": "Files containing required types/interfaces"
+        },
+        "exemplars": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["path", "reason"],
+            "properties": {
+              "path": { "type": "string" },
+              "reason": { "type": "string" }
+            }
+          },
+          "maxItems": 2,
+          "description": "Files showing patterns to follow"
+        },
+        "test_utilities": {
+          "type": "array",
+          "items": { "type": "string" },
+          "maxItems": 1,
+          "description": "Test helper files"
+        },
+        "total_files": {
+          "type": "integer",
+          "maximum": 11,
+          "description": "Total files in context"
+        },
+        "estimated_tokens": {
+          "type": "integer",
+          "maximum": 50000,
+          "description": "Estimated token count for context"
+        }
+      }
+    },
+
+    "Constraint": {
+      "type": "object",
+      "required": ["rule", "source"],
+      "properties": {
+        "rule": {
+          "type": "string",
+          "description": "What must be followed"
+        },
+        "source": {
+          "type": "string",
+          "description": "File where this pattern exists"
+        },
+        "example": {
+          "type": "string",
+          "description": "Code example of the pattern"
+        }
+      }
+    },
+
+    "Validation": {
+      "type": "object",
+      "required": ["command", "expected_outcome"],
+      "properties": {
+        "command": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Command to run for validation"
+        },
+        "expected_outcome": {
+          "type": "string",
+          "description": "What success looks like"
+        },
+        "timeout_seconds": {
+          "type": "integer",
+          "minimum": 10,
+          "maximum": 600,
+          "default": 120,
+          "description": "Max time for validation to complete"
+        },
+        "retry_on_failure": {
+          "type": "boolean",
+          "default": false,
+          "description": "Whether to retry failed validation"
+        }
+      }
+    },
+
+    "SuccessMarker": {
+      "type": "object",
+      "required": ["type"],
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": ["file_exists", "file_not_exists", "exports_exist", "command_succeeds", "output_contains", "output_matches"],
+          "description": "Type of success check"
+        },
+        "path": {
+          "type": "string",
+          "description": "File path for file_exists checks"
+        },
+        "file": {
+          "type": "string",
+          "description": "File to check for exports"
+        },
+        "exports": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Expected exports"
+        },
+        "command": {
+          "type": "string",
+          "description": "Command for command_succeeds checks"
+        },
+        "pattern": {
+          "type": "string",
+          "description": "Regex pattern for output_matches"
+        },
+        "substring": {
+          "type": "string",
+          "description": "String to find in output_contains"
+        }
+      }
+    },
+
+    "Dependencies": {
+      "type": "object",
+      "properties": {
+        "depends_on": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Task IDs this task depends on"
+        },
+        "blocks": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Task IDs blocked by this task"
+        }
+      }
+    },
+
+    "AgentAssignment": {
+      "type": "object",
+      "required": ["type"],
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": ["analyst", "architect", "implementer", "verifier"],
+          "description": "Which agent type handles this task"
+        },
+        "capabilities_required": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Specific capabilities needed"
+        }
+      }
+    },
+
+    "Rollback": {
+      "type": "object",
+      "required": ["strategy"],
+      "properties": {
+        "strategy": {
+          "type": "string",
+          "enum": ["delete_created_files", "git_restore", "manual"],
+          "description": "How to undo this task"
+        },
+        "files_to_remove": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Files to delete on rollback"
+        },
+        "files_to_restore": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Files to restore from git"
+        }
+      }
+    },
+
+    "Phase": {
+      "type": "object",
+      "required": ["phase", "name", "tasks"],
+      "properties": {
+        "phase": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Phase number"
+        },
+        "name": {
+          "type": "string",
+          "description": "Phase name"
+        },
+        "tasks": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Task IDs in this phase"
+        },
+        "parallel": {
+          "type": "boolean",
+          "default": false,
+          "description": "Whether tasks in this phase can run in parallel"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,72 @@
+{
+  "$schema": "./ralph-config-schema.json",
+  "version": "1.0",
+  "description": "Configuration for Ralph Executor",
+
+  "execution": {
+    "max_iterations": 5,
+    "iteration_timeout_seconds": 300,
+    "total_timeout_seconds": 1800,
+    "parallel_tasks": false
+  },
+
+  "reflection": {
+    "min_confidence_threshold": 0.3,
+    "max_same_error_attempts": 2,
+    "loop_detection": {
+      "enabled": true,
+      "sensitivity": "medium",
+      "hash_comparison": true
+    }
+  },
+
+  "gatekeeper": {
+    "enabled": true,
+    "auto_approve": false,
+    "checks": {
+      "diff_scope": true,
+      "security_patterns": true,
+      "constraint_adherence": true,
+      "revalidation": true,
+      "success_markers": true
+    },
+    "security_scan": {
+      "enabled": true,
+      "patterns_file": "./BOUNDARIES.json"
+    }
+  },
+
+  "git": {
+    "auto_commit": false,
+    "auto_push": false,
+    "commit_message_template": "feat({task_id}): {task_name}\n\n{summary}",
+    "branch_strategy": "feature-per-thread"
+  },
+
+  "escalation": {
+    "on_max_iterations": "pause_and_report",
+    "on_blocked": "pause_and_report",
+    "on_stuck": "pause_and_report",
+    "on_security_violation": "halt_immediately",
+    "on_scope_violation": "rollback_and_report"
+  },
+
+  "logging": {
+    "level": "info",
+    "include_timestamps": true,
+    "log_file": null,
+    "metrics_collection": true
+  },
+
+  "context_limits": {
+    "max_files": 11,
+    "max_tokens": 50000,
+    "warn_at_tokens": 40000
+  },
+
+  "rollback": {
+    "enabled": true,
+    "preserve_logs": true,
+    "snapshot_before_attempt": false
+  }
+}

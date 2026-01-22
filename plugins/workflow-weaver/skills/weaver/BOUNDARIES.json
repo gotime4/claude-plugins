@@ -1,0 +1,83 @@
+{
+  "version": "1.0",
+  "description": "Architectural boundary rules for Workflow-Weaver governance",
+
+  "protected_paths": {
+    "description": "Files/patterns that require explicit approval to modify",
+    "patterns": [
+      ".env*",
+      "*.secret*",
+      "**/credentials/**",
+      "**/secrets/**",
+      ".github/workflows/**",
+      "package-lock.json",
+      "yarn.lock",
+      "pnpm-lock.yaml",
+      "Gemfile.lock",
+      "poetry.lock",
+      "Cargo.lock"
+    ],
+    "explicit_files": [
+      "README.md",
+      "CHANGELOG.md",
+      "LICENSE",
+      ".gitignore"
+    ]
+  },
+
+  "dependency_rules": {
+    "description": "Rules governing external dependency changes",
+    "require_approval": true,
+    "blocked_packages": [],
+    "audit_required_for": [
+      "*crypto*",
+      "*auth*",
+      "*security*"
+    ]
+  },
+
+  "scope_limits": {
+    "description": "Maximum scope for a single implementation task",
+    "max_files_per_task": 5,
+    "max_lines_changed_per_task": 500,
+    "require_checkpoint_after_files": 3
+  },
+
+  "security_rules": {
+    "description": "Security patterns to detect and block",
+    "forbidden_patterns": [
+      "password\\s*=\\s*['\"][^'\"]+['\"]",
+      "api[_-]?key\\s*=\\s*['\"][^'\"]+['\"]",
+      "secret\\s*=\\s*['\"][^'\"]+['\"]",
+      "eval\\s*\\(",
+      "exec\\s*\\(",
+      "dangerouslySetInnerHTML"
+    ],
+    "require_review_patterns": [
+      "sudo\\s",
+      "chmod\\s+777",
+      "0\\.0\\.0\\.0",
+      "disable.*ssl",
+      "verify.*false"
+    ]
+  },
+
+  "style_enforcement": {
+    "description": "Code style rules to enforce",
+    "inherit_from_existing": true,
+    "check_before_commit": [
+      "consistent_indentation",
+      "no_trailing_whitespace",
+      "consistent_quotes",
+      "import_order"
+    ]
+  },
+
+  "escalation_thresholds": {
+    "boundary_violations": 3,
+    "test_failures": 3,
+    "context_overflows": 2,
+    "dependency_conflicts": 1,
+    "unclear_requirements": 1
+  }
+}

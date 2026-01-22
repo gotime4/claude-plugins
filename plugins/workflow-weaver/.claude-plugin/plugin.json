@@ -1,0 +1,21 @@
+{
+  "name": "workflow-weaver",
+  "description": "Enterprise-grade AI workflow orchestration system with multi-agent task decomposition, context isolation, and autonomous execution loops",
+  "version": "1.0.0",
+  "author": {
+    "name": "gotime4"
+  },
+  "homepage": "https://github.com/gotime4/claude-plugins",
+  "repository": "https://github.com/gotime4/claude-plugins",
+  "license": "MIT",
+  "keywords": [
+    "workflow",
+    "orchestration",
+    "multi-agent",
+    "task-management",
+    "prd",
+    "automation",
+    "enterprise"
+  ],
+  "category": "productivity"
+}

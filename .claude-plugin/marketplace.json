@@ -1,0 +1,30 @@
+{
+  "name": "gotime4-claude-plugins",
+  "description": "Collection of Claude Code plugins for enterprise workflow automation",
+  "owner": {
+    "name": "gotime4",
+    "url": "https://github.com/gotime4"
+  },
+  "plugins": [
+    {
+      "name": "workflow-weaver",
+      "source": "./plugins/workflow-weaver",
+      "description": "Enterprise-grade AI workflow orchestration with multi-agent task decomposition, context isolation, and autonomous execution loops (Ralph Wiggum Loop)",
+      "version": "1.0.0",
+      "author": {
+        "name": "gotime4"
+      },
+      "homepage": "https://github.com/gotime4/claude-plugins",
+      "repository": "https://github.com/gotime4/claude-plugins",
+      "license": "MIT",
+      "keywords": [
+        "workflow",
+        "orchestration",
+        "multi-agent",
+        "prd",
+        "automation"
+      ],
+      "category": "productivity"
+    }
+  ]
+}

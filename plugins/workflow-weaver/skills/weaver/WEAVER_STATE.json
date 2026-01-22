@@ -1,0 +1,13 @@
+{
+  "version": "1.0",
+  "session_id": null,
+  "thread": null,
+  "tasks": [],
+  "violations": [],
+  "checkpoints": [],
+  "metadata": {
+    "initialized_at": "2026-01-21T00:00:00Z",
+    "last_activity": null,
+    "total_threads_completed": 0
+  }
+}
