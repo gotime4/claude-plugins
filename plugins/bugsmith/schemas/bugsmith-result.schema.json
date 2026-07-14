@@ -1,0 +1,83 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/gotime4/claude-plugins/plugins/bugsmith/schemas/bugsmith-result.schema.json",
+  "title": "bugsmith result",
+  "description": "Machine-readable outcome of a bugsmith run. Emitted at the end of every run (Step 12) and returned as the bug-fixer agent's payload. Stable contract for headless callers (e.g. VegaTools).",
+  "type": "object",
+  "required": ["status", "ticket", "triage"],
+  "additionalProperties": false,
+  "properties": {
+    "status": {
+      "type": "string",
+      "enum": ["opened_pr", "dry_run", "skipped", "failed", "needs_human"],
+      "description": "opened_pr: PR created. dry_run: full run, no push. skipped: triage gate declined (medium/hard in autonomous). failed: an error or a failing test that couldn't be resolved. needs_human: blocked on a decision only a human can make."
+    },
+    "reason": {
+      "type": "string",
+      "description": "Human-readable explanation. Required when status is skipped/failed/needs_human."
+    },
+    "ticket": {
+      "type": "object",
+      "required": ["provider", "title"],
+      "properties": {
+        "id": { "type": "string" },
+        "provider": { "type": "string" },
+        "url": { "type": "string" },
+        "title": { "type": "string" }
+      }
+    },
+    "triage": {
+      "type": "object",
+      "required": ["complexity"],
+      "properties": {
+        "complexity": { "type": "string", "enum": ["easy", "medium", "hard"] },
+        "confidence": { "type": "number", "minimum": 0, "maximum": 1 },
+        "blastRadius": { "type": "string" },
+        "rationale": { "type": "string" }
+      }
+    },
+    "branch": { "type": "string" },
+    "baseBranch": { "type": "string" },
+    "prUrl": { "type": "string" },
+    "repo": { "type": "string" },
+    "mode": { "type": "string", "enum": ["interactive", "autonomous"] },
+    "dryRun": { "type": "boolean" },
+    "filesChanged": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "verification": {
+      "type": "array",
+      "description": "One entry per verification check attempted.",
+      "items": {
+        "type": "object",
+        "required": ["check", "status"],
+        "properties": {
+          "check": { "type": "string", "description": "e.g. unit, backend-unit, e2e-affected, typecheck, pre-pr, lint" },
+          "layer": { "type": "string", "enum": ["frontend", "backend", "both", "n/a"] },
+          "status": { "type": "string", "enum": ["passed", "failed", "skipped"] },
+          "detail": { "type": "string", "description": "For skipped: exactly what was missing (creds/emulator/server/browser)." }
+        }
+      }
+    },
+    "review": {
+      "type": "object",
+      "properties": {
+        "critical": { "type": "integer", "minimum": 0 },
+        "major": { "type": "integer", "minimum": 0 },
+        "minorFixed": { "type": "integer", "minimum": 0 },
+        "minorSkipped": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "followUps": {
+      "type": "array",
+      "description": "Deliberately-deferred work (e.g. a defense-in-depth backend guard).",
+      "items": { "type": "string" }
+    },
+    "alerts": {
+      "type": "array",
+      "description": "Loud notices the caller/human must see, e.g. 'E2E skipped: no staging creds'.",
+      "items": { "type": "string" }
+    }
+  }
+}

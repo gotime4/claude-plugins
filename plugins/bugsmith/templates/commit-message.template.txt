@@ -1,0 +1,9 @@
+{type}({scope}): {imperative summary, <=72 chars}
+
+{Why the bug happened and what the fix does, wrapped ~72 cols. Mention the
+principle/guard if the fix is more than a one-liner, and any sibling paths that
+were also patched.}
+
+Fixes {TICKET_ID}
+
+{CO_AUTHOR_TRAILER_PER_CLAUDEMD}

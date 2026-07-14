@@ -1,0 +1,51 @@
+{
+  "//": "Starter config tuned for vega-web (+ vega-cloud backend). Copy to the repo root as bugsmith.config.json and trim. All fields are optional; delete anything you want auto-detected.",
+  "baseBranch": "main",
+  "branch": {
+    "pattern": "{prefix}-{id}-{slug}",
+    "prefix": "CU"
+  },
+  "commit": {
+    "convention": "conventional",
+    "scopes": ["auth", "calendar", "events", "ui", "api", "staff", "types", "logging"],
+    "coAuthorTrailer": "Co-Authored-By: Claude <noreply@anthropic.com>"
+  },
+  "ticket": {
+    "provider": "auto",
+    "writeBack": false
+  },
+  "commands": {
+    "test": "npx vitest run {files}",
+    "typecheck": "npx vue-tsc --noEmit",
+    "build": "yarn build-dev",
+    "prePr": "skill:pre-pr-check",
+    "review": "skill:code-review",
+    "lintSkill": "skill:linting",
+    "lint": "npx eslint {files} --config eslint.config.js"
+  },
+  "e2e": {
+    "enabled": true,
+    "affectedTagsCmd": "npx tsx e2e/scripts/get-affected-tags.ts --files --format json",
+    "devServer": {
+      "startCmd": "node node_modules/vite/bin/vite.js --mode staging --port {port}",
+      "port": 5050,
+      "readyLog": "ready in",
+      "reuseExisting": true
+    },
+    "run": "TEST_ENV=stage WEBADMIN_URL=http://localhost:{port} npx playwright test {selectors} --reporter=list",
+    "credEnv": ["E2E_CREDENTIALS_KEY"],
+    "browserInstallCmd": "npx playwright install chromium"
+  },
+  "repos": {
+    "backend": {
+      "name": "vega-cloud",
+      "path": "../vega-cloud",
+      "testCmd": "firebase emulators:exec 'go test -p=1 ./{pkg}/...'",
+      "requires": ["jdk21", "firestore-emulator"]
+    }
+  },
+  "gates": {
+    "e2eMissingEnv": "skip",
+    "backendMissingToolchain": "skip"
+  }
+}

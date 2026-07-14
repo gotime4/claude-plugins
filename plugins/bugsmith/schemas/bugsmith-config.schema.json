@@ -1,0 +1,84 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/gotime4/claude-plugins/plugins/bugsmith/schemas/bugsmith-config.schema.json",
+  "title": "bugsmith config",
+  "description": "Optional per-repo configuration. Place as bugsmith.config.json at the repo root. Every field is optional; omitted fields are auto-detected or fall back to CLAUDE.md conventions. See reference/config.md.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "baseBranch": { "type": "string", "default": "main" },
+    "branch": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "pattern": { "type": "string", "description": "Tokens: {prefix} {id} {slug} {type}" },
+        "prefix": { "type": "string" }
+      }
+    },
+    "commit": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "convention": { "type": "string", "enum": ["conventional", "plain"] },
+        "scopes": { "type": "array", "items": { "type": "string" } },
+        "coAuthorTrailer": { "type": "string" }
+      }
+    },
+    "ticket": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "provider": { "type": "string", "enum": ["auto", "clickup", "github-issue", "raw"], "default": "auto" },
+        "writeBack": { "type": "boolean", "default": false }
+      }
+    },
+    "commands": {
+      "type": "object",
+      "description": "Per-step commands. A value may be a shell command, a 'skill:<name>' reference, or omitted to use the built-in behavior. {files} and {pkg} are substituted.",
+      "additionalProperties": { "type": "string" }
+    },
+    "e2e": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "enabled": { "type": "boolean", "default": true },
+        "affectedTagsCmd": { "type": "string" },
+        "devServer": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "startCmd": { "type": "string" },
+            "port": { "type": "integer" },
+            "readyLog": { "type": "string" },
+            "reuseExisting": { "type": "boolean", "default": true }
+          }
+        },
+        "run": { "type": "string" },
+        "credEnv": { "type": "array", "items": { "type": "string" } },
+        "browserInstallCmd": { "type": "string" }
+      }
+    },
+    "repos": {
+      "type": "object",
+      "description": "Sibling/backend repos for cross-repo fixes and backend tests.",
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "name": { "type": "string" },
+          "path": { "type": "string" },
+          "testCmd": { "type": "string" },
+          "requires": { "type": "array", "items": { "type": "string" } }
+        }
+      }
+    },
+    "gates": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "e2eMissingEnv": { "type": "string", "enum": ["skip", "block"], "default": "skip" },
+        "backendMissingToolchain": { "type": "string", "enum": ["skip", "block"], "default": "skip" }
+      }
+    }
+  }
+}

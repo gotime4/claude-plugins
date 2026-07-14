@@ -25,6 +25,30 @@
         "automation"
       ],
       "category": "productivity"
+    },
+    {
+      "name": "bugsmith",
+      "source": "./plugins/bugsmith",
+      "description": "Turn a bug ticket (ClickUp / GitHub issue) or a plain description into a verified, reviewed pull request: triage -> branch -> diagnose -> fix -> tests -> verify (unit + backend + affected E2E vs staging) -> pre-PR check -> lint -> CodeRabbit-style review -> conventional commit -> PR. Interactive by default, with a one-switch autonomous mode for headless / VegaTools use.",
+      "version": "0.1.0",
+      "author": {
+        "name": "Ryan Petersen"
+      },
+      "homepage": "https://github.com/gotime4/claude-plugins",
+      "repository": "https://github.com/gotime4/claude-plugins",
+      "license": "MIT",
+      "keywords": [
+        "bugfix",
+        "clickup",
+        "pull-request",
+        "automation",
+        "code-review",
+        "e2e",
+        "autonomous",
+        "triage",
+        "vega"
+      ],
+      "category": "productivity"
     }
   ]
 }
